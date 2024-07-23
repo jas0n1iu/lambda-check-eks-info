@@ -1,4 +1,4 @@
-# Lambda Function to Access EKS Cluster Information
+# Lambda Function to Check EKS Cluster Information
 
 This AWS CloudFormation template creates two Lambda functions and schedules them to run periodically using Amazon EventBridge (Scheduler). The first function, `GetEKSInfoFunction`, retrieves information about EKS clusters, node groups, and add-ons in the specified regions and saves the information as an Excel file in an S3 bucket. The second function, `CreateAccessEntryFunction`, creates an access entry and associates the `AmazonEKSViewPolicy` for the specified Lambda role in each EKS cluster.
 
