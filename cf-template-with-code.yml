@@ -21,8 +21,10 @@ Parameters:
     Type: List<String>
     Default: us-west-2
     AllowedValues:
-      - us-west-2
       - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
 
 Resources:
   GetEKSInfoFunction:
@@ -31,7 +33,7 @@ Resources:
       FunctionName: lambda-access-eks
       Description: Call the AWS Lambda API
       Handler: index.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.9
       Environment:
         Variables:
           S3_BUCKET_NAME: !Ref S3BucketName
