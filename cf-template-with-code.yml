@@ -6,9 +6,6 @@ Parameters:
   S3BucketName:
     Description: Name of the S3 Bucket for saving files & codes
     Type: String
-  LayerArn:
-    Description: ARN of the Lambda Layer containing Python dependencies
-    Type: String
   AddonController:
     Description: Controller Other than Addon from EKS
     Type: List<String>
@@ -25,6 +22,18 @@ Parameters:
       - us-east-2
       - us-west-1
       - us-west-2
+
+Resources:
+  LambdaK8SLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      LayerName: lambda-k8s-layer
+      Description: Lambda Layer containing Python dependencies
+      Content:
+        S3Bucket: !Ref S3BucketName
+        S3Key: layer/layer_content.zip
+      CompatibleRuntimes:
+        - python3.9
 
 Resources:
   GetEKSInfoFunction:
@@ -46,7 +55,7 @@ Resources:
       Timeout: 30
       MemorySize: 256
       Layers:
-        - !Ref LayerArn
+        - !Ref LambdaLayer
       Code:
        ZipFile: |
         import os
