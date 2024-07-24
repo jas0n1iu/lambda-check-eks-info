@@ -4,8 +4,9 @@ This repo creates two Lambda functions and schedules them to run periodically us
 
 ## Prerequisites
 
-1.  Create an S3 bucket to store the Excel file containing the EKS cluster information.
-2.  Create a Lambda layer containing the required Python dependencies. You can use the provided `deploy-lambda-layer.sh` script to create the layer and obtain its ARN.
+1.  Ensure that your AWS account has the necessary permissions to create CloudFormation stacks, Lambda functions, EventBridge rules, IAM roles, and other required resources.
+2.  Create an S3 bucket to store the Excel file containing the EKS cluster information.
+3.  Create a Lambda layer containing the required Python dependencies. You can use the provided `deploy-lambda-layer.sh` script to create the layer and obtain its ARN.
 
 ## Deployment
 
@@ -14,6 +15,7 @@ This repo creates two Lambda functions and schedules them to run periodically us
 Run the following command to create the Lambda layer:
 
 ```shell
+git clone https://github.com/jas0n1iu/lambda-check-eks-info.git
 ./deploy-lambda-layer.sh
 ```
 
