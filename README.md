@@ -1,7 +1,8 @@
 # Lambda Function to Check EKS Cluster Information
 
 This repo creates two Lambda functions and schedules them to run periodically using Amazon EventBridge (Scheduler). The first function, `GetEKSInfoFunction`, retrieves information about EKS clusters, node groups, and add-ons in the specified regions and saves the information as an Excel file in an S3 bucket. The second function, `CreateAccessEntryFunction`, creates an access entry and associates the `AmazonEKSViewPolicy` for the specified Lambda role in each EKS cluster.
-![Architecture Overview][(https://github.com/jasonliu929/terraform-wgmesh4gcr/blob/main/images/overview.png)](https://github.com/jas0n1iu/lambda-check-eks-info/blob/main/Architecture.png)
+
+![Architecture Overview](https://github.com/jas0n1iu/lambda-check-eks-info/blob/main/Architecture.png)
 
 ## Prerequisites
 
