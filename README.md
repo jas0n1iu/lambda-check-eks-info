@@ -16,7 +16,7 @@ Run the following command to create the Lambda layer:
 
 ```shell
 git clone https://github.com/jas0n1iu/lambda-check-eks-info.git
-./deploy-lambda-layer.sh
+./setup-env.sh
 ```
 
 This script will create the Lambda layer and output its ARN. Make a note of the ARN as it will be required when creating the CloudFormation stack.
