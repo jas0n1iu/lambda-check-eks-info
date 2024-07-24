@@ -54,7 +54,7 @@ Resources:
       Timeout: 30
       MemorySize: 256
       Layers:
-        - !Ref LambdaLayer
+        - !Ref LambdaK8SLayer
       Code:
         S3Bucket: !Ref S3BucketName
         S3Key: code/lambda-access-eks.zip
@@ -133,6 +133,7 @@ Resources:
                   - eks:ListAddons
                   - eks:DescribeNodegroup
                   - eks:ListNodegroups
+                  - eks:DescribeUpdate
                 Resource: '*'
         - PolicyName: S3BucketAccess
           PolicyDocument:
@@ -222,7 +223,7 @@ Resources:
 Outputs:
   LambdaLayerArn:
     Description: ARN of the Lambda Layer
-    Value: !Ref LambdaLayer
+    Value: !Ref LambdaK8SLayer
   Role:
     Description: IAM Role
     Value: !GetAtt 'GetEKSInfoFunctionRole.Arn'
