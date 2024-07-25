@@ -70,6 +70,8 @@ Resources:
         Variables:
           REGIONS: !Join [',', !Ref Regions]
           LAMBDA_ROLE_ARN: !GetAtt 'GetEKSInfoFunctionRole.Arn'
+          NAMESPACE: kube-system
+          POLICY_ARN: arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy
       Role: !GetAtt 'CreateAccessEntryRole.Arn'
       ReservedConcurrentExecutions: 5
       Timeout: 30
@@ -133,7 +135,6 @@ Resources:
                   - eks:ListAddons
                   - eks:DescribeNodegroup
                   - eks:ListNodegroups
-                  - eks:DescribeUpdate
                 Resource: '*'
         - PolicyName: S3BucketAccess
           PolicyDocument:
