@@ -8,11 +8,12 @@ This repo creates two Lambda functions and schedules them to run periodically us
 
 1.  Ensure that your AWS account has the necessary permissions to create CloudFormation stacks, Lambda functions, EventBridge rules, IAM roles, and other required resources.
 2.  Create an S3 bucket to store the Excel file containing the EKS cluster information.
-3.  Create a Lambda layer containing the required Python dependencies. You can use the provided `deploy-lambda-layer.sh` script to create the layer and obtain its ARN.
+3.  Create a Lambda layer containing the required Python dependencies. You can use the provided `setup-env.sh` script to create the layer and obtain its ARN.
+4.  Existing Amazon EKS clusters accross different regions
 
 ## Deployment
 
-### 1. Create Lambda Layer
+### 1. Package Lambda codes and layer zip files
 
 Before running the following command to setup envirement, you have to export S3_BUCKET_NAME to store Lambda codes and zip file used to create Lambda layer.
 
@@ -31,7 +32,6 @@ Use the provided `cf-template.yml` CloudFormation template to create the Lambd
 During the stack creation process, you will need to provide the following parameters:
 
 *   `S3BucketName`: The name of the S3 bucket where the Excel file will be stored.
-*   `LayerArn`: The ARN of the Lambda layer containing the Python dependencies, obtained from the previous step.
 *   `AddonController` (optional): A list of additional controllers (other than the default `aws-load-balancer-controller`) to be included in the cluster information. Allowed values are `cluster-autoscaler` and `aws-load-balancer-controller`.
 *   `Regions`: A list of AWS regions where the EKS clusters reside.
 
