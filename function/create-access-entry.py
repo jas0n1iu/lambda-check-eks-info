@@ -4,6 +4,8 @@ import boto3
 
 regions = os.environ.get('REGIONS').split(',')
 lambda_role_arn = os.environ.get('LAMBDA_ROLE_ARN')
+namespace = os.environ.get('NAMESPACE')
+policy_arn = os.environ.get('POLICY_ARN')
 
 
 def lambda_handler(event, context):
@@ -29,10 +31,10 @@ def lambda_handler(event, context):
             eks_client.associate_access_policy(
                 clusterName=cluster_name,
                 principalArn=lambda_role_arn,
-                policyArn='arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy',
+                policyArn=policy_arn,
                 accessScope={
                     'type': 'namespace',
-                    'namespaces': ['kube-system']
+                    'namespaces': [namespace]
                 }
             )
 
