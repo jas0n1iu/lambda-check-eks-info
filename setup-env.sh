@@ -1,10 +1,10 @@
 #!/bin/bash
-if ! hash aws 2>/dev/null || ! hash pip3 2>/dev/null; then
+if ! hash aws 2>/dev/null || ! hash python3 2>/dev/null || ! hash pip3 2>/dev/null; then
     echo "This script requires the AWS cli, and pip3 installed"
     exit 2
 fi
 
-# Create Lambda Layer
+# Package the Python kubernetes & openpyxl library in a layer .zip file
 python3 -m venv create_layer
 source create_layer/bin/activate
 pip3 install -r ./function/requirements.txt
