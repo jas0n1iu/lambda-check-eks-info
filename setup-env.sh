@@ -4,8 +4,6 @@ if ! hash aws 2>/dev/null || ! hash pip3 2>/dev/null; then
     exit 2
 fi
 
-S3_BUCKET_NAME=
-
 # Create Lambda Layer
 python3 -m venv create_layer
 source create_layer/bin/activate
