@@ -18,6 +18,7 @@ Run the following command to create the Lambda layer:
 
 ```shell
 git clone https://github.com/jas0n1iu/lambda-check-eks-info.git
+export S3_BUCKET_NAME=....... # export S3 Bucket Name to store Lambda codes and zip file used to create Lambda layer
 ./setup-env.sh
 ```
 
