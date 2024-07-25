@@ -4,10 +4,10 @@ Description: An AWS Lambda application that calls the AWS EKS and Kubernetes API
 
 Parameters:
   S3BucketName:
-    Description: Name of the S3 Bucket for saving files & codes
+    Description: The name of the S3 bucket where the Excel file will be stored.
     Type: String
   AddonController:
-    Description: Controller Other than Addon from EKS
+    Description: A list of additional controllers Other than default Addon from EKS
     Type: List<String>
     Default: aws-load-balancer-controller
     AllowedValues:
