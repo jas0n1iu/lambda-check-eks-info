@@ -162,10 +162,14 @@ def lambda_handler(event, context):
                     # 从 Pod 列表中提取 Pod 名称
                     deployment_pods = [pod.metadata.name for pod in pod_list.items]
 
+                    # Get the available replicas and total replicas for the Deployment
+                    available_replicas = deployment_info.status.available_replicas
+                    replicas = deployment_info.status.replicas
+                    
                     addon_data = {
                         'name': deployment,
                         'version': '',
-                        'status': deployment_info.status.conditions[0].type,
+                        'status': f'Available: {available_replicas}/{replicas}',
                         'service_account': deployment_info.spec.template.spec.service_account_name,
                         'addon_pods': deployment_pods
                     }
