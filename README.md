@@ -14,7 +14,7 @@ This repo creates two Lambda functions and schedules them to run periodically us
 
 ### 1. Create Lambda Layer
 
-Run the following command to create the Lambda layer:
+Before running the following command to setup envirement, you have to export S3_BUCKET_NAME to store Lambda codes and zip file used to create Lambda layer.
 
 ```shell
 git clone https://github.com/jas0n1iu/lambda-check-eks-info.git
