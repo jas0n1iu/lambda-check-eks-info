@@ -260,7 +260,9 @@ def lambda_handler(event, context):
     output.seek(0)
 
     # 将 Excel 文件上传到 S3 Bucket
-    object_key = 'eks-cluster-info/cluster_info_global.xlsx'
+    original_filename = 'eks-cluster-info/cluster_info_global.xlsx'
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    object_key = f"{original_filename.split('.')[0]}_{timestamp}.{original_filename.split('.')[-1]}"
     s3_client = boto3.client('s3')
     s3_client.upload_fileobj(output, bucket_name, object_key)
     print(f'集群信息表格已保存到 S3 bucket: {bucket_name}/{object_key}')
