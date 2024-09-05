@@ -1,0 +1,230 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Lambda application that calls the AWS EKS and Kubernetes API.
+
+Parameters:
+  S3BucketName:
+    Description: The name of the existing S3 bucket where the Excel file will be stored.
+    Type: String
+  AddonController:
+    Description: A list of additional controllers Other than default Addon from EKS
+    Type: List<String>
+    Default: aws-load-balancer-controller
+    AllowedValues:
+      - cluster-autoscaler
+      - aws-load-balancer-controller
+  Regions:
+    Description: The regions where the EKS cluster resides 
+    Type: List<String>
+    Default: us-west-2
+    AllowedValues:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+
+Resources:
+  LambdaK8SLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      LayerName: lambda-k8s-layer
+      Description: Lambda Layer containing Python dependencies
+      Content:
+        S3Bucket: !Ref S3BucketName
+        S3Key: layer/layer_content.zip
+      CompatibleRuntimes:
+        - python3.9
+        
+  GetEKSInfoFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: GetEKSInfo
+      Description: Call the AWS Lambda API
+      Handler: lambda-access-eks.lambda_handler
+      Runtime: python3.9
+      Environment:
+        Variables:
+          S3_BUCKET_NAME: !Ref S3BucketName
+          ADDON_CONTROLLER: !Join [',', !Ref AddonController]
+          NAMESPACE: kube-system
+          REGIONS: !Join [',', !Ref Regions]
+          LAMBDA_ROLE_ARN: !GetAtt 'GetEKSInfoFunctionRole.Arn'          
+      Role: !GetAtt 'GetEKSInfoFunctionRole.Arn'
+      ReservedConcurrentExecutions: 5
+      Timeout: 30
+      MemorySize: 256
+      Layers:
+        - !Ref LambdaK8SLayer
+      Code:
+        S3Bucket: !Ref S3BucketName
+        S3Key: code/lambda-access-eks.zip
+
+  CreateAccessEntryFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: CreateAccessEntry
+      Description: Create AccessEntry for EKS clusters
+      Handler: create-access-entry.lambda_handler
+      Runtime: python3.9
+      Environment:
+        Variables:
+          REGIONS: !Join [',', !Ref Regions]
+          LAMBDA_ROLE_ARN: !GetAtt 'GetEKSInfoFunctionRole.Arn'
+          NAMESPACE: kube-system
+          POLICY_ARN: arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy
+      Role: !GetAtt 'CreateAccessEntryRole.Arn'
+      ReservedConcurrentExecutions: 5
+      Timeout: 30
+      MemorySize: 128
+      Code:
+        S3Bucket: !Ref S3BucketName
+        S3Key: code/create-access-entry.zip
+
+  GetEKSInfoScheduler:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Description: Trigger GetEKSInfoFunction every week
+      ScheduleExpression: 'cron(0 9 ? * MON *)'
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Name: lambda-access-eks-scheduler
+      ScheduleExpressionTimezone: Asia/Shanghai
+      Target:
+        Arn: !GetAtt 'GetEKSInfoFunction.Arn'
+        RoleArn: !GetAtt 'GetEKSInfoScheduleRole.Arn'
+
+  CreateAccessEntryScheduler:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Description: Trigger CreateAccessEntryFunction every week
+      ScheduleExpression: 'cron(50 8 ? * MON *)'
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Name: create-access-entry-scheduler
+      ScheduleExpressionTimezone: Asia/Shanghai
+      Target:
+        Arn: !GetAtt 'CreateAccessEntryFunction.Arn'
+        RoleArn: !GetAtt 'CreateAccessEntryScheduleRole.Arn'
+
+  GetEKSInfoFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: EKSDescribeCluster
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - eks:DescribeCluster
+                  - eks:ListClusters
+                  - eks:AccessKubernetesApi
+                  - eks:DescribeAddon
+                  - eks:ListAddons
+                  - eks:DescribeNodegroup
+                  - eks:ListNodegroups
+                Resource: '*'
+        - PolicyName: S3BucketAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Join ['', ['arn:aws:s3:::', !Ref S3BucketName, '/*']]
+                  - !Join ['', ['arn:aws:s3:::', !Ref S3BucketName]]
+
+  CreateAccessEntryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: EKSDescribeCluster
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - eks:ListClusters
+                  - eks:CreateAccessEntry
+                  - eks:AssociateAccessPolicy
+                Resource: '*'
+
+  GetEKSInfoScheduleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: InvokeLambdaFunction
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt 'GetEKSInfoFunction.Arn'
+
+  CreateAccessEntryScheduleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: InvokeLambdaFunction
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt 'CreateAccessEntryFunction.Arn'
+Outputs:
+  LambdaLayerArn:
+    Description: ARN of the Lambda Layer
+    Value: !Ref LambdaK8SLayer
+  GetEKSInfoRole:
+    Description: GetEKSInfo IAM Role
+    Value: !GetAtt 'GetEKSInfoFunctionRole.Arn'
