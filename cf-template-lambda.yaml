@@ -2,17 +2,20 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: An AWS Lambda application that calls the AWS EKS and Kubernetes API.
 
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: 'EKS Cluster Regions & None Built-in Add-ons'
+        Parameters:
+          - Regions
+          - AddonController
+      - Label:
+          default: 'S3 Bucket to Store EKS Info'
+        Parameters:
+          - S3BucketName
+
 Parameters:
-  S3BucketName:
-    Description: The name of the existing S3 bucket where the Excel file will be stored.
-    Type: String
-  AddonController:
-    Description: A list of additional controllers Other than default Addon from EKS
-    Type: List<String>
-    Default: aws-load-balancer-controller
-    AllowedValues:
-      - cluster-autoscaler
-      - aws-load-balancer-controller
   Regions:
     Description: The regions where the EKS cluster resides 
     Type: List<String>
@@ -22,6 +25,16 @@ Parameters:
       - us-east-2
       - us-west-1
       - us-west-2
+  AddonController:
+    Description: A list of none built-in add-ons controllers other than default add-ons from EKS
+    Type: List<String>
+    Default: aws-load-balancer-controller
+    AllowedValues:
+      - cluster-autoscaler
+      - aws-load-balancer-controller
+  S3BucketName:
+    Description: The name of the existing S3 bucket where the Excel file will be stored.
+    Type: String
 
 Resources:
   LambdaK8SLayer:
