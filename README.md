@@ -27,9 +27,9 @@ This script will create the Lambda layer and output its ARN. Make a note of the 
 
 ### 2. Deploy CloudFormation Stack
 
-[![Launch Stack](https://cdn.rawgit.com/buildkite/cloudformation-launch-stack-button-svg/master/launch-stack.svg)](https://console.aws.amazon.com/cloudformation/home?#/stacks/create/review?templateURL=https://s3.us-west-2.amazonaws.com/examplelabs.net/cf-template.yml&stackName=EKSClusterInfoStack)  in Default Region for Accessing Public EKS 
+[![Launch Stack](https://cdn.rawgit.com/buildkite/cloudformation-launch-stack-button-svg/master/launch-stack.svg)](https://s3.us-west-2.amazonaws.com/examplelabs.net/template/cf-template-lambda.yaml&stackName=EKSClusterInfoStack)  in Default Region for Accessing Public EKS 
 
-[![Launch Stack](https://cdn.rawgit.com/buildkite/cloudformation-launch-stack-button-svg/master/launch-stack.svg)](https://console.aws.amazon.com/cloudformation/home?#/stacks/create/review?templateURL=https://s3.us-west-2.amazonaws.com/examplelabs.net/cf-template-with-code-vpc.yml&stackName=EKSClusterInfoStack)  in Default Region to Creating Lambda Functions in Private EKS VPC
+[![Launch Stack](https://cdn.rawgit.com/buildkite/cloudformation-launch-stack-button-svg/master/launch-stack.svg)](https://s3.us-west-2.amazonaws.com/examplelabs.net/template/cf-template-lambda-with-code-vpc.yaml&stackName=EKSClusterInfoStack)  in Default Region to Creating Lambda Functions in Private EKS VPC
 
 Or use the provided `cf-template.yml` or 'cf-template-with-code-vpc.yml' CloudFormation template to create the Lambda functions and scheduled events. You can deploy the stack using the AWS CloudFormation console, AWS CLI, or other deployment tools.
 
